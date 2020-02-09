@@ -7,3 +7,5 @@ If necessary modify config.js
 npm install
 node index.js
 ```
+
+Compatible with lisk-sdk 3.0.1^
