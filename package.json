@@ -1,7 +1,7 @@
 {
-  "name": "ldice-stresser",
+  "name": "ldice-toolkit",
   "version": "0.1.0",
-  "description": "Ldice stress testing tool",
+  "description": "Ldice toolkit",
   "author": "thepool",
   "license": "MIT",
   "dependencies": {

@@ -23,23 +23,14 @@ SOFTWARE.
 */
 
 var config = require('./config');
-var async = require('async');
-var sleep = require('sleep');
+var utils = require('./utils');
+const { APIClient } = require('@liskhq/lisk-client');
 const LiskNode = new APIClient([config.server]);
 
-function startLoop() {
-  console.log("Chunk:"+config.numberOfChunks);
-  config.numberOfChunks--;
-  if (config.numberOfChunks >= 0) {
-    for (var i = config.numberOfTransactions - 1; i >= 0; i--) {
-      async.parallel([
-          function(callback) {
-            SubmitTransaction(i);
-          },
-      ], function(err) {});
-      sleep.msleep(config.intervalInMs);
-    }
-  }
-}
-
-startLoop();
+var transaction = utils.createTransferTransaction('1500','16313739661670634666L',config.senderAccount,'load demo acc');
+var result = utils.broadcastTransaction(transaction,LiskNode);
+result.then(function(value) {
+  console.log(JSON.stringify(value.data));
+}).catch((error) => {
+  console.log('Promise error: '+error+' Raw-> '+JSON.stringify(error));
+});

@@ -22,10 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-var config = require('./config');
 var async = require('async');
 var sleep = require('sleep');
+var config = require('./config');
+var utils = require('./utils');
+const { APIClient } = require('@liskhq/lisk-client');
 const LiskNode = new APIClient([config.server]);
+
+function SubmitRandomBet(i,node) {
+  const amount = utils.randomNumberFrom(1,5).toString();
+  const bet = utils.randomNumberFrom(2,98).toString();
+  console.log('['+i+']Creating bet: '+bet+' with amount:'+bet);
+  var transaction = utils.createBetTransaction(amount,bet,config.senderAccount);
+  var result = utils.broadcastTransaction(transaction,node);
+  result.then(function(value) {
+    console.log('['+i+']'+JSON.stringify(value.data));
+    if (i==config.numberOfTransactions-1) {startLoop();}
+  }).catch((error) => {
+    console.log('['+i+']Promise error: '+error+' Raw-> '+JSON.stringify(error));
+    if (i==config.numberOfTransactions-1) {startLoop();}
+  });
+}
 
 function startLoop() {
   console.log("Chunk:"+config.numberOfChunks);
@@ -34,7 +51,7 @@ function startLoop() {
     for (var i = config.numberOfTransactions - 1; i >= 0; i--) {
       async.parallel([
           function(callback) {
-            SubmitTransaction(i);
+            SubmitRandomBet(i,LiskNode);
           },
       ], function(err) {});
       sleep.msleep(config.intervalInMs);
